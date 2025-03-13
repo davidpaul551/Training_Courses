@@ -1,0 +1,570 @@
+DDL Queries:
+---------------
+
+-- 1. create a new database called owners_pets
+create database owners_pets;
+
+-- 2. create the owners table
+create table owners (
+ id serial primary key,
+ first_name varchar(30),
+ last_name varchar(30),
+ city varchar(30),
+ state char(2)
+);
+
+-- 3. create the pets table (with a foreign key)
+create table pets (
+ id serial primary key,
+ species varchar(30),
+ full_name varchar(30),
+ age int,
+ owner_id int references owners(id)
+);
+
+-- 4. add an email column to the owners table
+alter table owners
+add column email varchar(50) unique;
+
+-- 5. change the data type of the last_name column in the owners table to varchar(50)
+
+alter table owners
+alter column last_name type varchar(50);
+
+
+DML Queries:
+-----------------------
+
+-- 1. insert the data into the owners table
+
+insert into owners (first_name, last_name, city, state, email)
+values 
+('samuel', 'smith', 'boston', 'ma', 'samsmith@gmail.com'),
+('emma', 'johnson', 'seattle', 'wa', 'emjohnson@gmail.com'),
+('john', 'oliver', 'new york', 'ny', 'johnoliver@gmail.com'),
+('olivia', 'brown', 'san francisco', 'ca', 'oliviabrown@gmail.com'),
+('simon', 'smith', 'dallas', 'tx', 'sismith@gmail.com'),
+(null, 'maxwell', null, 'ca', 'lordmaxwell@gmail.com');
+
+select * from owners;
+
+-- 2. insert the data into the pets table
+
+insert into pets (species, full_name, age, owner_id)
+values 
+('dog', 'rex', 6, 1),
+('rabbit', 'fluffy', 2, 5),
+('cat', 'tom', 8, 2),
+('mouse', 'jerry', 2, 2),
+('dog', 'biggles', 4, 2),
+('tortoise', 'squirtle', 42, 3);
+
+select * from pets;
+
+-- 3. update fluffy the rabbit's age to 3
+
+update pets
+set age = 3
+where full_name = 'fluffy';
+
+select * from pets;
+
+-- 4. delete mr maxwell from the owners table
+
+select * from owners;
+
+delete from owners
+where last_name = 'maxwell';
+
+
+
+
+
+Retrieving Data from Table:
+------------------------------
+
+-- 1. select the movie_name and release_date of every movie
+select movie_name, release_date from movies;
+
+-- 2. select the first and last names of all american directors
+select first_name, last_name from directors
+where nationality = 'american';
+
+-- 3. select all male actors born after the 1st of january 1970
+
+select * from actors
+where gender = 'm'
+and date_of_birth > '1970-01-01';
+
+-- 4. select the names of all movies which are over 90 minutes long and movie language is English
+
+select movie_name from movies
+where movie_length > 90
+and movie_lang = 'english';
+
+
+-- 1. select the movie names and movie language of all movies with a movie language of english, spanish, or Korean
+
+select movie_name, movie_lang from movies
+where movie_lang in ('english', 'spanish', 'korean');
+
+-- 2. select the first and last names of the actors whose last name begins with m and were born between 01/01/1940 and 31/12/1969
+
+select first_name, last_name from actors
+where last_name like 'm%'
+and date_of_birth between '1940-01-01' and '1969-12-31';
+
+-- 3. select the first and last names of the directors with nationality of british, french, or german born between 01/01/1950 and 31/12/1980
+
+select first_name, last_name from directors
+where nationality in ('british', 'french', 'german
+
+
+
+
+-- 1. select the american directors ordered from oldest to youngest
+
+select * from directors
+where nationality = 'american'
+order by date_of_birth;
+
+-- 2. return the distinct nationalities from the directors table
+
+select distinct nationality from directors;
+
+-- 3. return the first names, last names, and date of births of the 10 youngest female actors
+
+select first_name, last_name, date_of_birth from actors
+where gender = 'f'
+order by date_of_birth desc
+limit 10;
+
+
+-- 1. return the top 3 movies with the highest international takings
+
+select * from movie_revenues
+where international_takings is not null
+order by international_takings desc
+limit 3;
+
+-- 2. concatenate the first and last names of the directors, separated by a space,  and call this new column full_name
+
+select concat(first_name, ' ', last_name) as full_name from directors;
+
+-- 3. return the actors with missing first_names or missing date_of_births
+
+select * from actors
+where first_name is null
+or date_of_birth is null;
+
+
+
+Aggregate Functions:
+-----------------------
+
+-- 1. count the number of actors born after the 1st of january 1970
+
+select count(*) from actors
+where date_of_birth > '1970-01-01';
+
+-- 2. what was the highest and lowest domestic takings for a movie?
+
+select max(domestic_takings) from movie_revenues;
+select min(domestic_takings) from movie_revenues;
+
+-- 3. what is the sum total movie length for movies rated 15?
+
+select sum(movie_length) from movies
+where age_certificate = '15';
+
+-- 4. how many japanese directors are in the directors table?
+
+select count(*) from directors
+where nationality = 'japanese';
+
+-- 5. what is the average movie length for chinese movies?
+
+select avg(movie_length) from movies
+where movie_lang = 'chinese';
+
+
+
+-- 1. how many directors are there per nationality?
+
+select nationality, count(nationality) from directors
+group by nationality;
+
+-- 2. what is the sum total movie length for each age certificate and movie language combination?
+
+select movie_lang, age_certificate, sum(movie_length) from movies
+group by movie_lang, age_certificate
+order by movie_lang, age_certificate;
+
+-- 3. return the movie languages which have a sum total movie length of over 500 minutes
+
+select movie_lang, sum(movie_length) from movies
+group by movie_lang
+having sum(movie_length) > 500;
+
+
+
+JOINS:
+-----------
+
+-- 1. select the directors first and last names, the movie names and release dates for  all chinese, korean and japanese movies.
+
+select d.first_name, d.last_name, mo.movie_name, mo.release_date 
+from directors d
+join movies mo on d.director_id = mo.director_id
+where mo.movie_lang in ('chinese', 'japanese', 'korean');
+
+-- 2. select the movie names, release dates and international takings of all english language movies.
+
+select mo.movie_name, mo.release_date, mr.international_takings 
+from movies mo
+join movie_revenues mr on mo.movie_id = mr.movie_id
+where mo.movie_lang = 'english';
+
+-- 3. select the movie names, domestic takings and international takings for all  movies with either missing domestic takings or missing international takings and order the results by movie name.
+
+select mo.movie_name, mr.international_takings, mr.domestic_takings 
+from movies mo
+join movie_revenues mr on mo.movie_id = mr.movie_id
+where mr.domestic_takings is null
+or mr.international_takings is null
+order by mo.movie_name;
+
+
+
+
+-- 1. use a left join to select the first and last names of all british directors and the names and age certificates of the movies that they directed.
+
+select d.first_name, d.last_name, mo.movie_name, mo.age_certificate 
+from directors d
+left join movies mo on d.director_id = mo.director_id
+where d.nationality = 'british';
+
+-- 2. count the number of movies that each director has directed.
+
+select d.first_name, d.last_name, count(mo.movie_id) 
+from directors d
+left join movies mo on d.director_id = mo.director_id
+group by d.first_name, d.last_name;
+
+
+
+
+-- 1. select the first and last names of all the actors who have starred in movies directed by wes anderson.
+
+select ac.first_name, ac.last_name 
+from actors ac
+join movies_actors ma on ac.actor_id = ma.actor_id
+join movies mo on mo.movie_id = ma.movie_id
+join directors d on d.director_id = mo.director_id
+where d.first_name = 'wes'
+and d.last_name = 'anderson';
+
+-- 2. which director has the highest total domestic takings.
+
+select d.first_name, d.last_name, sum(mr.domestic_takings) as total_dom_takings 
+from directors d
+join movies mo on d.director_id = mo.director_id
+join movie_revenues mr on mo.movie_id = mr.movie_id
+where mr.domestic_takings is not null
+group by d.first_name, d.last_name
+order by total_dom_takings desc
+limit 1;
+
+
+
+-- 1. select the first names, last names and dates of birth from directors and actors. order the results by the date of birth.
+
+select first_name, last_name, date_of_birth from directors
+union all
+select first_name, last_name, date_of_birth from actors
+order by date_of_birth;
+
+-- 2. select the first and last names of all directors and actors born in the 1960s.order the results by last name.
+
+select first_name, last_name from directors
+where date_of_birth between '1960-01-01' and '1969-12-31'
+union all
+select first_name, last_name from actors
+where date_of_birth between '1960-01-01' and '1969-12-31'
+order by last_name;
+
+
+
+-- 1. Intersect the first name, last name and date of birth columns in the directors and actors tables.
+
+select first_name, last_name, date_of_birth from directors
+intersect
+select first_name, last_name, date_of_birth from actors;
+
+-- 2. Retrieve the first names of male actors unless they have the same first name as any British directors.
+
+select first_name from actors
+where gender = 'M'
+except
+select first_name from directors
+where nationality = 'British';
+
+
+
+
+SubQueries:
+----------------
+
+
+-- 1. select the first and last names of all the actors older than marlon brando.
+
+select first_name, last_name from actors
+where date_of_birth <
+(select date_of_birth from actors
+where first_name = 'marlon'
+and last_name = 'brando');
+
+-- 2. select the movie names of all movies that have domestic takings above 300 million.
+
+select movie_name from movies
+where movie_id in
+(select movie_id from movie_revenues
+where domestic_takings > 300.0);
+
+-- 3. return the shortest and longest movie length for movies with an above average domestic takings.
+
+select min(movie_length), max(movie_length) from movies
+where movie_id in
+(select movie_id from movie_revenues
+where domestic_takings >
+(select avg(domestic_takings) from movie_revenues));
+
+
+
+-- 1. select the first name, last name and date of birth for the oldest actors of each gender.
+
+select ac1.first_name, ac1.last_name, ac1.date_of_birth from actors ac1
+where ac1.date_of_birth =
+(select min(ac2.date_of_birth) from actors ac2
+where ac2.gender = ac1.gender);
+
+-- 2. select the movie name, movie length and age certificate for movies with an above average length for their age certificate.
+
+select mo1.movie_name, mo1.movie_length, mo1.age_certificate from movies mo1
+where movie_length >
+(select avg(mo2.movie_length) from movies mo2
+where mo2.age_certificate = mo1.age_certificate)
+order by mo1.age_certificate;
+
+
+
+
+
+String Functions:
+---------------------
+
+-- 1. select the directors' first and last names and movie names in upper case.
+
+select upper(d.first_name), upper(d.last_name), upper(m.movie_name)
+from directors d
+join movies m on d.director_id = m.director_id;
+
+-- 2. select the first and last names, in initial capitalisation format, of all the actors who have starred in a chinese or korean movie.
+
+select distinct initcap(a.first_name), initcap(a.last_name) from actors a
+join movies_actors ma on a.actor_id = ma.actor_id
+join movies m on m.movie_id = ma.movie_id
+where m.movie_lang in ('chinese','korean');
+
+-- 3. retrieve the reversed first and last names of each director and the first three characters of their nationality.
+
+select reverse(first_name), reverse(last_name), left(nationality, 3) from
+directors;
+
+-- 4. retrieve the initials of each director and display it in one column named ‘initials’.
+
+select concat_ws('.', left(first_name, 1), left(last_name, 1)) as initials,
+first_name, last_name
+from directors;
+
+
+-- 1. Use the substring function to retrieve the first 6 characters of each movie name and the year they released.
+
+SELECT SUBSTRING(movie_name, 1, 6) AS movie_name,
+SUBSTRING(release_date::TEXT, 1, 4) AS year
+FROM movies;
+
+-- 2. Retrieve the first name initial and last name of every actor born in May.
+
+SELECT SUBSTRING(first_name, 1, 1) AS fn_initial, last_name, date_of_birth
+FROM actors
+WHERE SPLIT_PART(date_of_birth::TEXT, '-', 2) = '05';
+
+-- 3. Replace the movie language for all English language movies, with age certificaterating 18, to ‘Eng’.
+
+UPDATE movies
+SET movie_lang = REPLACE(movie_lang, 'English', 'Eng')
+WHERE age_certificate = '18';
+SELECT * FROM movies;
+
+
+
+
+ Conditional Statements and Functions:
+------------------------------------------
+
+
+-- 1. return the movie names and whether they are international box office smashes, hits, or flops.
+
+select m.movie_name, mr.international_takings,
+    case
+        when mr.international_takings >= 300 then 'smash'
+        when mr.international_takings >= 100 then 'hit'
+        when mr.international_takings >= 0 then 'flop'
+        else 'missing information'
+    end as international_box_office
+from movie_revenues mr
+join movies m on mr.movie_id = m.movie_id;
+
+-- 2. return the continent that the directors are based on their nationality.
+
+select first_name, last_name, nationality,
+    case 
+        when nationality in ('chinese', 'japanese') then 'asia'
+        when nationality in ('german', 'french') then 'europe'
+        when nationality in ('america', 'mexico') then 'america'
+        when nationality = 'brazil' then 'south america'
+        when nationality = 'australia' then 'oceania'
+        else 'no information'
+    end as continent
+from directors;
+
+
+
+
+
+-- 1. Return the number of movies suitable for children ('U', 'PG') and not suitable ('12', '15', '18').
+
+select 
+    case
+        when age_certificate in ('U', 'PG') then 'suitable'
+        when age_certificate in ('12', '15', '18') then 'not suitable'
+    end as is_suitable,
+    count(*) as total
+from movies
+group by 
+    case
+        when age_certificate in ('U', 'PG') then 'suitable'
+        when age_certificate in ('12', '15', '18') then 'not suitable'
+    end;
+
+-- 2. For each age certificate, return the average domestic takings for English-language movies and the average international takings for non-English 
+movies.
+
+select m.age_certificate,
+    avg(case 
+            when m.movie_lang = 'English' then mv.domestic_takings
+            else mv.international_takings 
+        end) as avg_takings
+from movies m
+join movie_revenues mv on m.movie_id = mv.movie_id
+group by m.age_certificate;
+
+
+
+
+Coalesce and NULL_IF:
+--------------------------
+-- 1. Return movie names, movie languages, and age certificates. Return NULL if the movie language is 'English' or the age certificate is 'U'.
+
+select movie_name, 
+    nullif(movie_lang, 'English') as movie_language,
+    nullif(age_certificate, 'U') as age_certificate
+from movies;
+
+-- 2. Return the column that contains the difference in values between domestic takings and international takings for each movie, ensuring NULL values are treated as 0.
+
+select movie_id,
+    abs(coalesce(domestic_takings, 0) - coalesce(international_takings, 0)) as difference_dom_int
+from movie_revenues;
+
+
+
+Window Function:
+------------------
+
+-- 1. return the running total domestic takings for each movie age certificate ordered by release date for english language movies only.
+
+select m.movie_name, 
+       m.movie_lang, 
+       mr.domestic_takings, 
+       sum(mr.domestic_takings) over (partition by m.age_certificate order by m.release_date) as running_total
+from movies m 
+join movie_revenues mr on m.movie_id = mr.movie_id
+where m.movie_lang = 'english';
+
+
+-- 2. find the moving/running minimum, maximum, and average movie lengths for each director nationality ordered by movie name.
+
+select m.movie_name, 
+       d.first_name, 
+       d.nationality, 
+       m.movie_length, 
+       min(m.movie_length) over (partition by d.nationality order by m.movie_name) as running_min_length,
+       max(m.movie_length) over (partition by d.nationality order by m.movie_name) as running_max_length,
+       avg(m.movie_length) over (partition by d.nationality order by m.movie_name) as running_avg_length
+from movies m 
+inner join directors d on d.director_id = m.director_id;
+
+
+
+
+
+ROW_NUMBER $ RANK:
+------------------------
+
+-- 1. return the 3 longest movies for each movie language (use row_number).
+
+select * from 
+  (select movie_name, movie_length, movie_lang,
+          row_number() over (partition by movie_lang order by movie_length desc) as row_num
+   from movies) as m
+where row_num <= 3;
+
+
+-- 2. return the ranking of movies based on their domestic takings per movie language.
+
+select m.movie_name, 
+       m.movie_lang, 
+       mr.domestic_takings,
+       rank() over (partition by m.movie_lang order by mr.domestic_takings desc) as ranking
+from movies m
+join movie_revenues mr on m.movie_id = mr.movie_id
+where mr.domestic_takings is not null;
+
+
+
+-- 1. return movies, ordered by release date, comparing the international takings to the previous row value , ignore the null values and use a default value of zero.
+
+select m.movie_name, m.release_date, mr.international_takings,
+       lag(mr.international_takings, 1, 0.0) 
+       over (order by m.release_date) as previous_international_takings
+from movies m
+join movie_revenues mr on m.movie_id = mr.movie_id
+where mr.international_takings is not null;
+
+
+-- 2. return the second movie name in each age certification window/partition ordered by domestic takings ignoring the null values.
+
+select distinct m.age_certificate,
+       nth_value(m.movie_name, 2) 
+       over (partition by m.age_certificate order by mr.domestic_takings asc 
+             rows between unbounded preceding and unbounded following) as second_movie
+from movies m
+join movie_revenues mr on m.movie_id = mr.movie_id
+where mr.domestic_takings is not null;
+
+
+
+
+

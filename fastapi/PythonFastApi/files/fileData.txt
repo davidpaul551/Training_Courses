@@ -1,0 +1,32 @@
+This is a new file
+This file contains about the fastapi project
+This is a fast developing framework
+
+
+@router.post('/file')
+def get_file(file:bytes=File(...)):
+    content = file.decode('utf-8')
+    lines = content.splitlines()
+    return {"lines":lines}
+
+
+Result:
+
+{
+  "lines": [
+    "This is a new file",
+    "This file contains about the fastapi project",
+    "This is a fast developing framework"
+  ]
+}
+
+
+Upload File:
+===============
+- provides more functionality 
+- Stored in memory up to a certain size and then on disk
+- It is as Python file like object , we can do read and write operations
+
+Better for large files (reads in chunks, doesn’t overload memory).
+Access to metadata (filename, content_type).
+Supports async reading with .read() or .iter_chunks().
