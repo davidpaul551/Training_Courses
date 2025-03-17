@@ -1,0 +1,211 @@
+ question 1: 
+
+Insert multiple companies (company data of your choice) into a collection both with insertOne() and insertMany()
+
+-- db.companies.insertOne({name: "InfoTech", stock: 100})
+
+{
+  acknowledged: true,
+  insertedId: ObjectId('67d3ef5e6efade0a02b7123c')
+}
+
+-- db.companies.insertMany([
+	{name: "InfoView", stock: 250},
+	{name: "AG&P", stock:500}
+])
+
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('67d3ef986efade0a02b7123d'),
+    '1': ObjectId('67d3ef986efade0a02b7123e')
+  }
+}
+
+-- db.companies.find().pretty()
+
+[
+  {
+    _id: ObjectId('67d3ef5e6efade0a02b7123c'),
+    name: 'InfoTech',
+    stock: 100
+  },
+  {
+    _id: ObjectId('67d3ef986efade0a02b7123d'),
+    name: 'InfoView',
+    stock: 250
+  },
+  {
+    _id: ObjectId('67d3ef986efade0a02b7123e'),
+    name: 'AG&P',
+    stock: 500
+  }
+]
+
+
+question 2:
+
+ Deliberately insert duplicate ID data and "fix" failing additions with unordered inserts
+
+
+
+-- db.companies.insertMany(
+	[
+		{name: "fresh beverages inc", stock: 88, _id: ObjectId('67d3ef986efade0a02b7123e')},
+		{name: "Capgemini", stock:1400 }
+	],
+	{ordered: false}
+
+)
+
+
+output:
+Uncaught:
+MongoBulkWriteError: E11000 duplicate key error collection: Assignments.companies index: _id_ dup key: { _id: ObjectId('67d3ef986efade0a02b7123e') }
+Result: BulkWriteResult {
+  insertedCount: 1,
+  matchedCount: 0,
+  modifiedCount: 0,
+  deletedCount: 0,
+  upsertedCount: 0,
+  upsertedIds: {},
+  insertedIds: { '1': ObjectId('67d3f0786efade0a02b7123f') }
+}
+Write Errors: [
+  WriteError {
+    err: {
+      index: 0,
+      code: 11000,
+      errmsg: "E11000 duplicate key error collection: Assignments.companies index: _id_ dup key: { _id: ObjectId('67d3ef986efade0a02b7123e') }",
+      errInfo: undefined,
+      op: {
+        name: 'fresh beverages inc',
+        stock: 88,
+        _id: ObjectId('67d3ef986efade0a02b7123e')
+      }
+    }
+  }
+]
+
+ -- db.companies.find().pretty()
+
+output:
+
+[
+  {
+    _id: ObjectId('67d3ef5e6efade0a02b7123c'),
+    name: 'InfoTech',
+    stock: 100
+  },
+  {
+    _id: ObjectId('67d3ef986efade0a02b7123d'),
+    name: 'InfoView',
+    stock: 250
+  },
+  {
+    _id: ObjectId('67d3ef986efade0a02b7123e'),
+    name: 'AG&P',
+    stock: 500
+  },
+  {
+    _id: ObjectId('67d3f0786efade0a02b7123f'),
+    name: 'Capgemini',
+    stock: 1400
+  }
+]
+
+ question 3:
+
+ Write data for a new company with both journaling being guaranteed and
+not being guaranteed
+
+ -- db.companies.insertOne(
+	{name: "Asc", stock: 2000},
+	{writeConcern: {w: 1, j: false}}
+)
+
+{
+  acknowledged: true,
+  insertedId: ObjectId('67d3f19c6efade0a02b71240')
+}
+
+ -- db.companies.find().pretty()
+
+output:
+[
+  {
+    _id: ObjectId('67d3ef5e6efade0a02b7123c'),
+    name: 'InfoTech',
+    stock: 100
+  },
+  {
+    _id: ObjectId('67d3ef986efade0a02b7123d'),
+    name: 'InfoView',
+    stock: 250
+  },
+  {
+    _id: ObjectId('67d3ef986efade0a02b7123e'),
+    name: 'AG&P',
+    stock: 500
+  },
+  {
+    _id: ObjectId('67d3f0786efade0a02b7123f'),
+    name: 'Capgemini',
+    stock: 1400
+  },
+  {
+    _id: ObjectId('67d3f19c6efade0a02b71240'),
+    name: 'Asc',
+    stock: 2000
+  }
+]
+
+
+ -- db.companies.insertOne(
+	{name: "Tech", stock: 2000},
+	{writeConcern: {w: 1, j: true}}
+)
+
+
+{
+  acknowledged: true,
+  insertedId: ObjectId('67d3f1ef6efade0a02b71241')
+}
+
+
+-- db.companies.find().pretty()
+
+output: 
+
+[
+  {
+    _id: ObjectId('67d3ef5e6efade0a02b7123c'),
+    name: 'InfoTech',
+    stock: 100
+  },
+  {
+    _id: ObjectId('67d3ef986efade0a02b7123d'),
+    name: 'InfoView',
+    stock: 250
+  },
+  {
+    _id: ObjectId('67d3ef986efade0a02b7123e'),
+    name: 'AG&P',
+    stock: 500
+  },
+  {
+    _id: ObjectId('67d3f0786efade0a02b7123f'),
+    name: 'Capgemini',
+    stock: 1400
+  },
+  {
+    _id: ObjectId('67d3f19c6efade0a02b71240'),
+    name: 'Asc',
+    stock: 2000
+  },
+  {
+    _id: ObjectId('67d3f1ef6efade0a02b71241'),
+    name: 'Tech',
+    stock: 2000
+  }
+]

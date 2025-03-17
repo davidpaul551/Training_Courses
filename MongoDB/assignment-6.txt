@@ -1,0 +1,122 @@
+
+1) Pick 3 Points on Google Maps and store them in a collection.
+
+
+Query:
+
+db.places.insertOne({name: "p1", loc: {type: "Point", coordinates: [18.235401, 79.054504]}})
+
+db.places.insertOne({name: "p2", loc: {type: "Point", coordinates: [18.233958, 79.056080]}})
+
+db.places.insertOne({name: "p3", loc: {type: "Point", coordinates: [18.234451, 79.053797]}})
+
+
+
+
+2) Pick a point and find the nearest points within a min and max distance.
+
+
+Query:
+
+const myLocation = [18.235401, 79.054504]
+
+db.places.createIndex({loc: "2dsphere"})
+
+db.places.find({loc: {$near: {$geometry: {type: "Point", coordinates: myLocation}, $minDistance: 0, $maxDistance: 5000 }}}).pretty()
+
+
+output:
+---------
+[
+  {
+    _id: ObjectId('67d3fb396efade0a02b71245'),
+    name: 'p1',
+    loc: { type: 'Point', coordinates: [ 18.235401, 79.054504 ] }
+  },
+  {
+    _id: ObjectId('67d3fb466efade0a02b71247'),
+    name: 'p3',
+    loc: { type: 'Point', coordinates: [ 18.234451, 79.053797 ] }
+  },
+  {
+    _id: ObjectId('67d3fb406efade0a02b71246'),
+    name: 'p2',
+    loc: { type: 'Point', coordinates: [ 18.233958, 79.05608 ] }
+  }
+]
+
+
+
+3) Pick an area and see which points (that are stored in your collection) it contains.
+
+
+Query:
+
+
+const p1 = [18.235401, 79.054504]
+const p2 = [18.233958, 79.056080]
+const p3 = [18.234451, 79.053797]
+
+const polygonArea = [[p1, p2, p3, p1]]
+const polygonObject = {type: "Polygon", coordinates: polygonArea}
+
+db.places.find({loc: {$geoWithin: {$geometry: polygonObject}}}).pretty()
+
+[
+  {
+    _id: ObjectId('67d3fb406efade0a02b71246'),
+    name: 'p2',
+    loc: { type: 'Point', coordinates: [ 18.233958, 79.05608 ] }
+  },
+  {
+    _id: ObjectId('67d3fb396efade0a02b71245'),
+    name: 'p1',
+    loc: { type: 'Point', coordinates: [ 18.235401, 79.054504 ] }
+  },
+  {
+    _id: ObjectId('67d3fb466efade0a02b71247'),
+    name: 'p3',
+    loc: { type: 'Point', coordinates: [ 18.234451, 79.053797 ] }
+  }
+]
+
+
+
+
+4) Store at least one area in a different collection.
+
+
+Query:
+
+db.areas.insertOne({name: "Free Time well-being Area", a: polygonObject})
+
+
+
+
+
+5) Pick a point and find out which areas in your collection contain that point.
+
+
+Query:
+
+
+db.areas.find({a: {$geoIntersects: {$geometry: {type: "Point", coordinates: [18.234451, 79.053797]}}}}).pretty()
+
+
+[
+  {
+    _id: ObjectId('67d3fdf46efade0a02b71248'),
+    name: 'Green Area',
+    a: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [ 18.235401, 79.054504 ],
+          [ 18.233958, 79.05608 ],
+          [ 18.234451, 79.053797 ],
+          [ 18.235401, 79.054504 ]
+        ]
+      ]
+    }
+  }
+]

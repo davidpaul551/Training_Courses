@@ -1,0 +1,69 @@
+1) As a database Admin, Work on Database, Create Collections, Create indexes.
+
+ 
+ 
+use admin
+ 
+db.createUser({user: 'Paul', pwd: 'Paul', roles:["userAdminAnyDatabase"]})
+ 
+db.auth('Paul','Paul')
+ 
+db.createUser({user: 'globalAdmin', pwd: 'admin', roles: ["dbAdminAnyDatabase"]})
+ 
+db.createUser({user: 'dev', pwd: 'dev', roles: [{role: "readWrite", db: "customers"}, {role: "readWrite", db: "sales"}]})
+ 
+
+
+
+2) As a User admin, manage users.
+
+Query: 
+
+mongo -u Paul -p Paul --authenticationDatabase admin
+ 
+mongo -u superAdmin -p admin --authenticationDatabase admin
+ 
+show dbs
+ 
+db.createCollection("customerData")
+ 
+show collections
+
+
+
+
+3) As a developer, read & write data in "Customers" and "Sales" Database?
+
+
+Query:
+
+mongosh -u dev -p dev --authenticationDatabase admin
+ 
+use customers
+ 
+db.customer.insertOne({firstName: "Doggala" , lastName:"David"})
+ 
+
+
+use Posts
+
+db.blog.insertOne({title: "Super natural power"})
+
+ Error:
+
+[js] WriteCommandError: not authorized on blog to execute comm
+and { insert: "posts", ordered: true, lsid: { id: UUID("5863f5d6-2374-448c-bc20-f3df794c6b8c") }, $db:
+"Posts" } :
+WriteCommandError ({
+"ok" : 0,
+"errmsg" : "not authorized on blog to execute command { insert: \"posts\", ordered: true, lsid
+: { id: UUID(\"5863f5d6-2374-448c-bc20-f3df794c6b8c\") }, $db: \ "Posts\" }",
+"code" : 13,
+"codeName" : "Unauthorized"
+})
+WriteCommandError@src/mongo/shell/bulk_api.js:420:48
+Bulk/executeBatch@src/mongo/shell/bulk_api.js:902:1
+Bulk/this.execute@src/mongo/shell/bulk_api.js:1150:21
+DBCollection. prototype.insertOne@src/mongo/shell/crud_api.js:252:9
+@(shell) :1:1
+>

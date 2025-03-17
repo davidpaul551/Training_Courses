@@ -1,0 +1,153 @@
+Question-1:
+
+-- db.patients.insertMany([
+  {
+    "firstName": "David",
+    "lastName": "Paul",
+    "age": 23,
+    "history": [
+      { "disease": "cold", "treatment": "tablets" }
+    ]
+  },
+  {
+    "firstName": "Ravi",
+    "lastName": "Kumar",
+    "age": 30,
+    "history": [
+      { "disease": "cough", "treatment": "syrup" }
+    ]
+  },
+  {
+    "firstName": "Raju",
+    "lastName": "Ram",
+    "age": 24,
+    "history": [
+      { "disease": "cold", "treatment": "tablets" }
+    ]
+  }
+]);
+
+
+
+
+-- db.patients.find()
+[
+  {
+    _id: ObjectId('67d3eb1d6efade0a02b71239'),
+    firstName: 'David',
+    lastName: 'Paul',
+    age: 23,
+    history: [ { disease: 'cold', treatment: 'tablets' } ]
+  },
+  {
+    _id: ObjectId('67d3eb1d6efade0a02b7123a'),
+    firstName: 'Ravi',
+    lastName: 'Kumar',
+    age: 30,
+    history: [ { disease: 'cough', treatment: 'syrup' } ]
+  },
+  {
+    _id: ObjectId('67d3eb1d6efade0a02b7123b'),
+    firstName: 'Raju',
+    lastName: 'Ram',
+    age: 24,
+    history: [ { disease: 'cold', treatment: 'tablets' } ]
+  }
+]
+
+
+Question-2
+
+
+db.patients.updateOne(
+    {
+    "firstName": "David","history.disease": "cold"
+    },
+    { 
+    $set : { "age": 24 , "lastName" : "David", "history.$.treatment": "inhaler"}
+    }
+)
+
+Output:
+
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+
+
+
+-- db.patients.find().pretty()
+[
+  {
+    _id: ObjectId('67d3eb1d6efade0a02b71239'),
+    firstName: 'David',
+    lastName: 'David',
+    age: 24,
+    history: [ { disease: 'cold', treatment: 'inhaler' } ]
+  },
+  {
+    _id: ObjectId('67d3eb1d6efade0a02b7123a'),
+    firstName: 'Ravi',
+    lastName: 'Kumar',
+    age: 30,
+    history: [ { disease: 'cough', treatment: 'syrup' } ]
+  },
+  {
+    _id: ObjectId('67d3eb1d6efade0a02b7123b'),
+    firstName: 'Raju',
+    lastName: 'Ram',
+    age: 24,
+    history: [ { disease: 'cold', treatment: 'tablets' } ]
+  }
+]
+
+
+Question-3:
+
+
+db.patients.updateOne({"firstName": "Ravi"},{$set:{"age":40}})
+
+Output:
+
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+
+db.patients.find({age : {$gt: 30}})
+[
+  {
+    _id: ObjectId('67d3eb1d6efade0a02b7123a'),
+    firstName: 'Ravi',
+    lastName: 'Kumar',
+    age: 40,
+    history: [ { disease: 'cough', treatment: 'syrup' } ]
+  }
+]
+
+
+Question-4:
+
+ --db.patients.deleteMany({"history.disease": "cold"})
+{ acknowledged: true, deletedCount: 1 }
+
+
+ -- db.patients.find().pretty()
+[
+  {
+    _id: ObjectId('67d3eb1d6efade0a02b7123a'),
+    firstName: 'Ravi',
+    lastName: 'Kumar',
+    age: 40,
+    history: [ { disease: 'cough', treatment: 'syrup' } ]
+  }
+]
