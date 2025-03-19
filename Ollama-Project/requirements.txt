@@ -1,0 +1,15 @@
+requests
+faiss-cpu
+sentence-transformers
+python-dotenv
+torch
+transformers
+diffusers
+Pillow
+datasets
+soundfile
+gradio
+ollama
+langchain
+plotly
+huggingface_hub
