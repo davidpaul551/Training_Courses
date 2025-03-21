@@ -1,0 +1,10 @@
+langchain
+langchain-community
+langchain-ollama
+tweepy
+langchain-pinecone
+pypdf
+faiss-cpu # local vector store
+streamlit
+langchain-experimental
+tabulate

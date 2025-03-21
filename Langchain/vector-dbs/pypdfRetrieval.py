@@ -1,0 +1,33 @@
+import os
+from langchain_community.document_loaders import PyPDFLoader
+from langchain.text_splitter import CharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+from langchain.chains.retrieval import create_retrieval_chain
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain import hub
+from langchain_community.llms.ollama import Ollama
+from langchain_ollama import OllamaEmbeddings
+
+print("HIi")
+pdf_path = "C:/Users/david.doggala/OneDrive - ascendion/Desktop/Langchain/vector-dbs/Attention is all you need.pdf"
+
+
+loader = PyPDFLoader(file_path=pdf_path)
+document = loader.load()
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=30,separator="\n")
+docs = text_splitter.split_documents(documents=document)
+
+embeddings = OllamaEmbeddings(model="llama3.2")
+vectorstore = FAISS.from_documents(docs,embeddings)
+vectorstore.save_local("faiss_index_react")
+
+new_vectorstore = FAISS.load_local(
+    "faiss_index_react",embeddings,allow_dangerous_deserialization=True
+)
+retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
+llm = Ollama(model="llama3.2")
+combine_docs_chain = create_stuff_documents_chain(llm , retrieval_qa_chat_prompt)
+retrieval_chain = create_retrieval_chain(new_vectorstore.as_retriever(),combine_docs_chain)
+res = retrieval_chain.invoke({"input":"Give me the gist of ReAct in 3 sentences"})
+print(res["answer"])
+
