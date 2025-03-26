@@ -11,17 +11,12 @@ from langchain import hub
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from tools.tool import get_profile_url_tavily
-load_dotenv()
-CERT_PATH = r"C:\Users\david.doggala\OneDrive - ascendion\Desktop\cacert.pem"  # Adjust this to your saved .pem file
-
-# Configure requests to use the custom certificate
-os.environ["REQUESTS_CA_BUNDLE"] = CERT_PATH
 
 def lookup(name:str) ->str:
 
 
     llm = OllamaLLM(model="llama3.2")
-    template = """given the full name {name_of_person} I want you t get me a link to their LinkedIn profile page.You should only give me only a url"""
+    template = """given the full name {name_of_person} I want you to get me a link to their LinkedIn profile page.You should only give me only a url"""
     prompt_template = PromptTemplate(template=template , input_variables=["name_of_person"])
     tools_for_agent = [
         Tool(

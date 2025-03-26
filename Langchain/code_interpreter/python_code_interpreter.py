@@ -9,7 +9,6 @@ load_dotenv()
 def main():
     print("Start...")
 
-    # Updated prompt with explicit ReAct instructions
     instructions = """
     You are an agent designed to write and execute Python code to answer questions using the ReAct framework.
     You have access to the following tools: {tool_names}.
@@ -34,33 +33,30 @@ def main():
         input_variables=["input", "tool_names", "tools", "agent_scratchpad"]
     )
 
-    # Define tools
+    # PythonREPLTool is a tool that allows the agent to execute Python code dynamically within a Python Read-Eval-Print Loop (REPL)
     tools = [PythonREPLTool()]
 
-    # Initialize the Ollama LLM
     llm = OllamaLLM(model="llama3.2")
 
-    # Create the ReAct agent
     agent = create_react_agent(
         prompt=prompt,
         llm=llm,
         tools=tools,
     )
 
-    # Create the agent executor with handle_parsing_errors=True
     agent_executor = AgentExecutor(
         agent=agent,
         tools=tools,
         verbose=True,
-        handle_parsing_errors=True  # Handle parsing errors gracefully
+        handle_parsing_errors=True
     )
 
-    # Invoke the agent with the user input
     result = agent_executor.invoke({
         "input": "Write a python code to print prime numbers and number of prime numbers below n value in two different functions"
     })
+    return result
 
-    print(result)
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
+
+

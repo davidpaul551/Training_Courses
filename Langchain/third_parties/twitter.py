@@ -35,7 +35,7 @@ load_dotenv()
 #     return tweet_list
 
 
-def scrape_user_tweets_mock(username="EdenEmarco177", num_tweets=5):
+def scrape_user_tweets_mock(username="EdenEmarco177"):
     """
     Scrapes pre made Edens's Github Gist file of tweets and returns them as a list of dictionaries.
     Each dictionary has three fields: "time_posted" (relative to now), "text", and "url".

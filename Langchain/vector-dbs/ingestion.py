@@ -8,13 +8,6 @@ from langchain_ollama import OllamaEmbeddings
 from langchain_pinecone import PineconeVectorStore
 load_dotenv()
 
-# Path to the downloaded certificate
-CERT_PATH = "C:/Users/david.doggala/OneDrive - ascendion/Desktop/Langchain/vector-dbs/app.pinecone.io.crt"
-
-# Set the certificate for requests and urllib3
-os.environ["REQUESTS_CA_BUNDLE"] = CERT_PATH
-os.environ["SSL_CERT_FILE"] = CERT_PATH
-print("Ingestion")
 
 loader = TextLoader("C:/Users/david.doggala/OneDrive - ascendion/Desktop/Langchain/vector-dbs/blog.txt",encoding="utf-8")
 document = loader.load()

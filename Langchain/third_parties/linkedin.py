@@ -4,9 +4,6 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
-
-
-
 def scrape_linkedin_profile(linkedin_url:str,mock:bool = False):
 
     if mock:

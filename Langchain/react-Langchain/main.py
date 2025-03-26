@@ -148,4 +148,3 @@ input_question = "What is the length of DOG in characters"
 result = run_agent_with_scratchpad(input_question)
 print("\nFull Agent Execution Result:")
 print(result)
-

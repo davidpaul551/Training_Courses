@@ -134,7 +134,7 @@ def main():
         agent=grand_agent,
         tools=grand_tools,
         verbose=True,
-        handle_parsing_errors=True  # Allow the agent to retry on parsing errors
+        handle_parsing_errors=True
     )
 
     # Test the Grand Agent
