@@ -6,6 +6,7 @@ import certifi
 load_dotenv(override=True)
 
 api_key = os.getenv("OPENROUTER_API_KEY")
+print("Using API Key:", api_key)  # Debugging line
 if not api_key:
     raise ValueError("Missing API key. Please set OPENROUTER_API_KEY in your environment variables.")
 
